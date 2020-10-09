@@ -18,11 +18,18 @@
       <div class="flex flex-row">
         <div
           class="py-5 px-8 border-b-2 focus:outline-none tab cursor-pointer"
-          :class="[activeTab == tab.name ? 'text-grey-black font-bold border-primary': 'text-grey font-semibold border-40', tabHasErrors(tab) ? 'text-error' : '' ]"
+          :class="[
+            activeTab == tab.name
+              ? 'text-grey-black font-bold border-primary'
+              : 'text-grey font-semibold border-40',
+            tabHasErrors(tab) ? 'text-error' : '',
+          ]"
           v-for="(tab, key) in tabs"
           :key="key"
           @click="handleTabClick(tab, $event)"
-        >{{ tab.name }}</div>
+        >
+          {{ tab.name }}
+        </div>
         <div class="flex-1 border-b-2 border-40"></div>
       </div>
       <div
@@ -31,10 +38,10 @@
         :label="tab.name"
         :key="'related-tabs-fields' + index"
       >
-        <div :class="{'px-6 py-3':!tab.listable}">
+        <div :class="{ '': !tab.listable }">
           <component
             v-for="(field, index) in tab.fields"
-            :class="{'remove-bottom-border': index == tab.fields.length - 1}"
+            :class="{ 'remove-bottom-border': index == tab.fields.length - 1 }"
             :key="'tab-' + index"
             :is="'form-' + field.component"
             :resource-name="resourceName"
@@ -58,14 +65,14 @@
 import {
   FormField,
   HandlesValidationErrors,
-  InteractsWithResourceInformation
+  InteractsWithResourceInformation,
 } from "laravel-nova";
 
 export default {
   mixins: [
     HandlesValidationErrors,
     FormField,
-    InteractsWithResourceInformation
+    InteractsWithResourceInformation,
   ],
   props: [
     "resource",
@@ -75,37 +82,37 @@ export default {
     "errors",
     "viaResource",
     "viaRelationship",
-    "viaResourceId"
+    "viaResourceId",
   ],
   data() {
     return {
       tabs: null,
-      activeTab: ""
+      activeTab: "",
     };
   },
   computed: {
     fieldsOutsideTabs() {
       return [];
-    }
+    },
   },
   watch: {
     errors: {
-      handler: function(errors) {
+      handler: function (errors) {
         let vm = this;
         let goToTab = false;
-        Object.keys(vm.tabs).forEach(function(key) {
+        Object.keys(vm.tabs).forEach(function (key) {
           if (vm.tabHasErrors(vm.tabs[key]) && !goToTab) {
             goToTab = true;
             return vm.handleTabClick(vm.tabs[key]);
           }
         });
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   mounted() {
     let tabs = {};
-    _.toArray(this.field.fields).forEach(field => {
+    _.toArray(this.field.fields).forEach((field) => {
       if (!field.tab) {
         return this.fieldsOutsideTabs.push(field);
       }
@@ -113,7 +120,7 @@ export default {
         tabs[field.tab] = {
           name: field.tab,
           listable: field.listableTab,
-          fields: []
+          fields: [],
         };
       }
       tabs[field.tab].fields.push(field);
@@ -126,7 +133,7 @@ export default {
      * Fill the given FormData object with the field's internal value.
      */
     fill(formData) {
-      _.each(this.field.fields, field => {
+      _.each(this.field.fields, (field) => {
         field.fill(formData);
       });
     },
@@ -144,8 +151,13 @@ export default {
       let hasErrors = false;
       let vm = this;
 
-      Object.keys(this.errors.errors).forEach(function(key) {
-        if (_.includes(tab.fields.map(o => o["attribute"]), key)) {
+      Object.keys(this.errors.errors).forEach(function (key) {
+        if (
+          _.includes(
+            tab.fields.map((o) => o["attribute"]),
+            key
+          )
+        ) {
           hasErrors = true;
         }
       });
@@ -153,8 +165,8 @@ export default {
       tab.hasErrors = hasErrors;
 
       return hasErrors;
-    }
-  }
+    },
+  },
 };
 </script>
 
