@@ -1,7 +1,12 @@
 <template>
     <div>
         <slot>
-            <h4 v-if="panel.showTitle" class="text-90 font-normal text-2xl mb-3">{{ panel.name }}</h4>
+            <h4
+                v-if="panel.showTitle"
+                class="text-90 font-normal text-2xl mb-3"
+            >
+                {{ panel.name }}
+            </h4>
         </slot>
         <div class="relationship-tabs-panel card">
             <div class="tabs-wrap border-b-2 border-40 w-full">
@@ -20,8 +25,10 @@
             </div>
             <div
                 :class="[
-                    (panel && panel.defaultSearch) ? 'default-search' : 'tab-content',
-                    tab.slug,
+                    panel && panel.defaultSearch
+                        ? 'default-search'
+                        : 'tab-content',
+                    tab.slug
                 ]"
                 :ref="getTabRefName(tab)"
                 v-for="(tab, index) in tabs"
@@ -29,13 +36,13 @@
                 :label="tab.name"
                 :key="'related-tabs-fields' + index"
             >
-                <div
-                    v-if="tab.init"
-                    :class="getBodyClass(tab)"
-                >
+                <div v-if="tab.init" :class="getBodyClass(tab)">
                     <component
                         v-for="(field, index) in tab.fields"
-                        :class="{'remove-bottom-border': index === tab.fields.length - 1}"
+                        :class="{
+                            'remove-bottom-border':
+                                index === tab.fields.length - 1
+                        }"
                         :key="'tab-' + index"
                         :is="componentName(field)"
                         :resource-name="resourceName"
@@ -51,21 +58,21 @@
 </template>
 
 <script>
-import BehavesAsPanel from 'laravel-nova/src/mixins/BehavesAsPanel';
-import TabTitle from './TabTitle';
-import { changeActiveTab } from '../util/tab-updater';
+import BehavesAsPanel from "laravel-nova/src/mixins/BehavesAsPanel";
+import TabTitle from "./TabTitle";
+import { changeActiveTab } from "../util/tab-updater";
 
 export default {
-    components: {TabTitle},
+    components: { TabTitle },
     mixins: [BehavesAsPanel],
     data() {
         return {
             tabs: null,
-            activeTab: '',
+            activeTab: ""
         };
     },
     mounted() {
-        const tabs = this.tabs = this.panel.fields.reduce((tabs, field) => {
+        const tabs = (this.tabs = this.panel.fields.reduce((tabs, field) => {
             if (!(field.tabSlug in tabs)) {
                 tabs[field.tabSlug] = {
                     name: field.tab,
@@ -73,16 +80,19 @@ export default {
                     init: false,
                     listable: field.listableTab,
                     fields: [],
-                    properties: field.tabInfo,
+                    properties: field.tabInfo
                 };
             }
 
             tabs[field.tabSlug].fields.push(field);
 
             return tabs;
-        }, {});
+        }, {}));
 
-        if (this.$route.query.tab !== undefined && tabs[this.$route.query.tab] !== undefined) {
+        if (
+            this.$route.query.tab !== undefined &&
+            tabs[this.$route.query.tab] !== undefined
+        ) {
             this.handleTabClick(tabs[this.$route.query.tab]);
         } else if (this.panel.selectFirstTab) {
             this.handleTabClick(tabs[Object.keys(tabs)[0]], false);
@@ -93,7 +103,7 @@ export default {
          * Handle the actionExecuted event and pass it up the chain.
          */
         actionExecuted() {
-            this.$emit('actionExecuted');
+            this.$emit("actionExecuted");
         },
         handleTabClick(tab, updateUri = true) {
             const currentTab = this.$router.currentRoute.query;
@@ -107,16 +117,16 @@ export default {
         },
         componentName(field) {
             return field.prefixComponent
-                ? 'detail-' + field.component
+                ? "detail-" + field.component
                 : field.component;
         },
         getTabClass(tab) {
             const classes = [];
 
             if (this.activeTab === tab.slug) {
-                classes.push('text-grey-black font-bold border-primary');
+                classes.push("text-grey-black font-bold border-primary");
             } else {
-                classes.push('text-grey font-semibold border-40');
+                classes.push("text-grey font-semibold border-40");
             }
 
             return classes.concat(tab.properties.tabClass);
@@ -125,21 +135,24 @@ export default {
             const classes = [];
 
             if (!tab.listable) {
-                classes.push('px-6 py-3');
+                classes.push("px-6 py-3");
             }
 
             return classes.concat(tab.properties.bodyClass);
         },
         getTabRefName(tab) {
             return `tab-${tab.slug}`;
-        },
-    },
+        }
+    }
 };
 </script>
 
-
 <style lang="scss">
 .relationship-tabs-panel {
+    h1 {
+        display: none;
+    }
+
     .has-search-bar {
     }
 
